@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  telegram-mcp:
+    build: .
+    container_name: mcp-telegram-server
+    ports:
+      - "8008:8008"
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - HOST=0.0.0.0
+      - PORT=8008
+      - DEBUG=${DEBUG:-false}
+    env_file:
+      - .env
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8008/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  default:
+    name: mcp-telegram-network 
