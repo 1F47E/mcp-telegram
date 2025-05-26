@@ -95,20 +95,66 @@ Add to `claude_desktop_config.json`:
 
 ## Available Tools
 
-### send_message
-Send a text message to your configured Telegram chat.
+### notify\_with\_telegram:text
+Send a text message to your configured Telegram chat using basic HTML formatting.
 
 **Parameters:**
-- `message` (required): The text message to send
-- `parse_mode` (optional): "Markdown", "MarkdownV2", or "HTML"
+- `message` (required): The text message to send. Can include supported HTML tags.
 
 **Example:**
 ```json
 {
-  "message": "Hello from MCP! 🚀\n\n**Bold text** and *italic text*",
-  "parse_mode": "Markdown"
+  "message": "Hello from MCP! 🚀\n\n<b>Bold text</b> and <i>italic text</i>. More info: <a href=\"http://www.example.com/\">example.com</a>. Remember to use &lt; &gt; &amp; for special characters like this: 5 &gt; 3."
 }
 ```
+
+### Supported HTML Formatting
+
+When sending messages, you can use the following HTML tags for formatting. Make sure to properly close all tags and escape special characters (`<`, `>`, `&`) within your text content and `href` attributes using `&lt;`, `&gt;`, and `&amp;` respectively.
+
+- **Bold:**
+  `<b>bold text</b>`
+  `<strong>bold text</strong>`
+
+- **Italic:**
+  `<i>italic text</i>`
+  `<em>italic text</em>`
+
+- **Underline:**
+  `<u>underlined text</u>`
+  `<ins>underlined text</ins>`
+
+- **Strikethrough:**
+  `<s>strikethrough text</s>`
+  `<strike>strikethrough text</strike>`
+  `<del>strikethrough text</del>`
+
+- **Spoiler:**
+  `<span class="tg-spoiler">spoiler text</span>`
+  `<tg-spoiler>spoiler text</tg-spoiler>`
+
+- **Inline Link:**
+  `<a href="URL_HERE">link text</a>`
+  Example: `<a href="https://telegram.org">Telegram</a>`
+
+- **Inline Code:**
+  `<code>inline fixed-width code</code>`
+  Example: `<code>my_variable = 10;</code>`
+
+- **Pre-formatted Code Block:**
+  `<pre>multi-line
+fixed-width code block</pre>`
+
+- **Pre-formatted Code Block (with language specification):**
+  `<pre><code class="language-yourlanguage">your code here</code></pre>`
+  Example: `<pre><code class="language-python">def hello():
+  print("Hello, HTML!")</code></pre>`
+
+**Nesting and Tag Restrictions:**
+- Tags must be correctly nested (e.g., `<b><i>bold italic</i></b>`).
+- `<b>`, `<i>`, `<u>`, `<s>`, and spoiler tags can contain and be part of other entities, except for `<pre>` and `<code>`.
+- Other entities (like `<a>`, `<code>`, `<pre>`) cannot contain each other.
+- Only the HTML tags listed above are supported by Telegram.
 
 ## Environment Variables
 

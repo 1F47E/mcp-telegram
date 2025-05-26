@@ -113,19 +113,24 @@ async def initialize_telegram():
 
 # --- MCP Tool Handlers ---
 async def handle_send_message(params: Dict[str, Any]) -> Dict[str, Any]:
-    """Send a text message via Telegram"""
+    """Send a text message via Telegram using HTML formatting"""
     if not telegram_bot:
         raise HTTPException(status_code=500, detail="Telegram bot not initialized")
     
+    logging.info(f"handle_send_message (now notify_with_telegram:text) called with params: {params}")
     message = params.get("message")
     if not message:
         raise HTTPException(status_code=400, detail="Missing 'message' parameter")
+
+    final_telegram_parse_mode = "HTML" # Always use HTML
     
+    logging.info(f"Effective Telegram parse_mode: '{final_telegram_parse_mode}' for message: '{message[:50]}...'")
+
     try:
         sent_message = await telegram_bot.send_message(
             chat_id=settings.telegram_chat_id,
             text=message,
-            parse_mode="MarkdownV2" if params.get("parse_mode") == "MarkdownV2" else "Markdown"
+            parse_mode=final_telegram_parse_mode
         )
         
         return {
@@ -144,23 +149,17 @@ async def handle_send_message(params: Dict[str, Any]) -> Dict[str, Any]:
 
 # --- MCP Tools Registry ---
 TOOLS = {
-    "send_message": {
+    "notify_with_telegram:text": {
         "handler": handle_send_message,
         "schema": {
-            "name": "send_message",
-            "description": "Send a text message via Telegram",
+            "name": "notify_with_telegram:text",
+            "description": "Send a text message via Telegram using basic HTML formatting. Supported tags: <b>, <i>, <u>, <s>, <tg-spoiler>, <code>, <pre>, <a href='...'>. Remember to escape <, >, &.",
             "inputSchema": {
                 "type": "object",
                 "properties": {
                     "message": {
                         "type": "string",
-                        "description": "The message text to send"
-                    },
-                    "parse_mode": {
-                        "type": "string",
-                        "enum": ["Markdown", "MarkdownV2", "HTML"],
-                        "description": "Text formatting mode",
-                        "default": "Markdown"
+                        "description": "The message text to send, can include basic HTML tags."
                     }
                 },
                 "required": ["message"]
